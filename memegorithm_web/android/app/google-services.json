@@ -1,0 +1,29 @@
+{
+  "project_info": {
+    "project_number": "733352801116",
+    "project_id": "ybigta-memegorithm",
+    "storage_bucket": "ybigta-memegorithm.appspot.com"
+  },
+  "client": [
+    {
+      "client_info": {
+        "mobilesdk_app_id": "1:733352801116:android:187ce5478f61cdd2004799",
+        "android_client_info": {
+          "package_name": "com.example.memegorithm_web"
+        }
+      },
+      "oauth_client": [],
+      "api_key": [
+        {
+          "current_key": "AIzaSyDFuG1k0pshZKpmNzcFiX2qvZ-Ef6OXLPk"
+        }
+      ],
+      "services": {
+        "appinvite_service": {
+          "other_platform_oauth_client": []
+        }
+      }
+    }
+  ],
+  "configuration_version": "1"
+}
