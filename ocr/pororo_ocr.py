@@ -16,14 +16,38 @@ ocr = Pororo(task='ocr')
 ocr_dict = {}
 cnt = 0
 for i in tqdm(os.listdir(args.path)):
-    path = args.path + '/' + i 
-    idx = int(i[:-4])
     try :
-        #ocr_dict[i] = ocr(path, detail=True)
+        path = args.path + '/' + i 
+        idx = int(i[:-4])
+        
+        ocrresult = ocr(path, detail=True)
 
-        strs = ocr(path, detail=False)
-        max_str = max(strs, key=len, default="")
-        ocr_dict[idx] = max_str
+        if len(ocrresult["bounding_poly"])==0:
+            
+            ocr_dict[idx]=""
+        elif len(ocrresult["bounding_poly"])==1:
+            ocr_dict[idx] = ocrresult["bounding_poly"][0]["description"]
+        else:
+            maxsurf = 0
+            maxidx = 0
+            for j in range(len(ocrresult)):
+                x0 = ocrresult["bounding_poly"][j]["vertices"][0]["x"]
+                y0 = ocrresult["bounding_poly"][j]["vertices"][0]["y"]
+                x1 = ocrresult["bounding_poly"][j]["vertices"][2]["x"]
+                y1 = ocrresult["bounding_poly"][j]["vertices"][2]["y"]
+
+                width = x1-x0
+                height = y1-y0
+
+                surface = width*height
+                if surface > maxsurf:
+                    maxsurf = surface
+                    maxidx = j
+            ocr_dict[idx] = ocrresult["bounding_poly"][j]["description"]
+
+        #strs = ocr(path, detail=False)
+        #max_str = max(strs, key=len, default="")
+        #ocr_dict[idx] = max_str
     except Exception as error: 
         print(f"{i}\t{error}")
         cnt+=1
