@@ -1,9 +1,7 @@
 import 'package:firebase_auth/firebase_auth.dart';
-import 'package:firebase_database/firebase_database.dart';
 import 'package:cloud_firestore/cloud_firestore.dart';
 import 'package:flutter/material.dart';
 import 'package:memegorithm_web/firebase_authentication.dart';
-import 'package:memegorithm_web/models/content.dart';
 import 'package:memegorithm_web/models/post.dart';
 import 'package:memegorithm_web/pages/post/write_post_screen.dart';
 
