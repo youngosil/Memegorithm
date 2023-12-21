@@ -2,7 +2,9 @@ import 'dart:io';
 import 'dart:js_util';
 import 'dart:typed_data';
 import 'dart:async';
+import 'dart:convert';
 
+import 'package:http/http.dart' as http;
 import 'package:cloud_firestore/cloud_firestore.dart';
 import 'package:firebase_auth/firebase_auth.dart';
 import 'package:firebase_core/firebase_core.dart';
@@ -33,6 +35,7 @@ class WritePostScreen extends StatefulWidget {
 class _WritePostState extends State<WritePostScreen> {
   List<Widget> widgetList = [];
   List<String> contentList = [];
+  List<TextEditingController> textControllers = [];
   List<File> imgList = [];
 
   final TextEditingController titleController = TextEditingController();
@@ -53,6 +56,9 @@ class _WritePostState extends State<WritePostScreen> {
   @override
   void dispose() {
     // Dispose of the TextEditingController when not needed
+    for (var controller in textControllers) {
+      controller.dispose();
+    }
     _textEditingController.dispose();
     super.dispose();
   }
@@ -113,6 +119,7 @@ class _WritePostState extends State<WritePostScreen> {
                               decoration: const InputDecoration(
                                 hintText: 'Type something...',
                               ),
+                              maxLines: 10,
                             ),
                           ),
                           Column(children: widgetList),
@@ -154,7 +161,7 @@ class _WritePostState extends State<WritePostScreen> {
 
   void _addTextField() {
     //File file = newObject();
-    setState(() {
+    /*setState(() {
       widgetList.add(
         const TextField(
           decoration: InputDecoration(
@@ -163,7 +170,28 @@ class _WritePostState extends State<WritePostScreen> {
         ),
       );
       contentList.add('');
-      //imgList.add(file);
+      //imgList.add(file);*/
+
+    TextEditingController controller = TextEditingController();
+    textControllers.add(controller);
+
+    setState(() {
+      widgetList.add(
+        TextField(
+          controller: controller,
+          decoration: const InputDecoration(
+            hintText: 'Enter text...',
+          ),
+          onChanged: (text) {
+            // Update the contentList when the text changes
+            int index = textControllers.indexOf(controller);
+            if (index >= 0 && index < contentList.length) {
+              contentList[index] = text;
+            }
+          },
+        ),
+      );
+      contentList.add('');
     });
   }
 
@@ -193,13 +221,14 @@ class _WritePostState extends State<WritePostScreen> {
   }*/
 
   Future<void> _pickImage() async {
-    Image? image = await ImagePickerWeb.getImageAsWidget();
+    /*File imgFile = ImagePickerWeb.getImageAsFile() as File;
+    String name = 'test1';
 
     setState(() {
       widgetList.add(image!);
       contentList.add(image.toString());
       //imgList.add(imageFile);
-    });
+    });*/
   }
 
   /*Future<void> _pickImage() async {
@@ -221,8 +250,7 @@ class _WritePostState extends State<WritePostScreen> {
       var content = widgetList[i];
       if (content is TextField) {
         // Text content
-        contents.add(
-            Content(type: 'text', content: content.controller?.text ?? ''));
+        contents.add(Content(type: 'text', content: textControllers[i].text));
       } else if (content is Image) {
         // Image content
         // Upload image to Firebase Storage and get the download URL
@@ -239,9 +267,7 @@ class _WritePostState extends State<WritePostScreen> {
     // Now, you have title and contents
     // Call your FirebaseService to upload the post
     try {
-      await FirebaseFirestore.instance
-          .collection('posts')
-          .add(post as Map<String, dynamic>);
+      await FirebaseFirestore.instance.collection('posts').add(post.toMap());
       // Successfully added post to Firestore
     } catch (error) {
       print('Error uploading post to Firestore: $error');
@@ -275,7 +301,7 @@ class _WritePostState extends State<WritePostScreen> {
     _debounceTimer?.cancel();
 
     // Create a new debounce timer
-    _debounceTimer = Timer(const Duration(milliseconds: 500), () {
+    _debounceTimer = Timer(const Duration(milliseconds: 700), () {
       // Get the selection
       TextSelection selection = _textEditingController.selection;
 
@@ -288,8 +314,10 @@ class _WritePostState extends State<WritePostScreen> {
         // Check if the text has changed
         if (newText != selectedText) {
           selectedText = newText;
+          Future<String> res = sendPostRequest(selectedText);
           setState(() {
             print('Selected Text Changed: $selectedText');
+            print(res);
           });
         }
       } else {
@@ -302,5 +330,22 @@ class _WritePostState extends State<WritePostScreen> {
         }
       }
     });
+  }
+
+  Future<String> sendPostRequest(String message) async {
+    String url = 'http://165.132.46.82:30527/';
+    Map<String, String> headers = {"Content-Type": "application/json"};
+    //Map<String, dynamic> data = {'text': message};
+    String jsonBody = json.encode({'text': message});
+
+    // POST 요청을 보내고 응답을 받음
+    final response = await http.post(
+      Uri.parse(url),
+      headers: headers,
+      body: jsonBody,
+    );
+
+    print(utf8.decode(response.bodyBytes));
+    return utf8.decode(response.bodyBytes);
   }
 }

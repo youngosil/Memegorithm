@@ -27,4 +27,13 @@ class Post {
       contents: contents,
     );
   }
+
+  Map<String, dynamic> toMap() {
+    return {
+      'title': title,
+      'user': user,
+      'contents': contents.map((content) => content.toMap()).toList(),
+      // Add other fields as needed
+    };
+  }
 }
