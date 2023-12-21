@@ -67,6 +67,7 @@ class PostDetailScreen extends StatelessWidget {
 
     try {
       var url = await ref.getDownloadURL();
+      print(url);
       return Image.network(url, width: 100, height: 100);
     } catch (e) {
       print('Error loading image: $e');
