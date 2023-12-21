@@ -123,7 +123,9 @@ class _HomeScreenState extends State<HomeScreen> {
                       Navigator.push(
                         context,
                         MaterialPageRoute(
-                            builder: (context) => const WritePostScreen()),
+                            builder: (context) => WritePostScreen(
+                                user: widget.user,
+                                authService: widget._authService)),
                       );
                     },
                     child: const Text('글쓰기',

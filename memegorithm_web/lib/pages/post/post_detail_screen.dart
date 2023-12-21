@@ -15,11 +15,14 @@ class PostDetailScreen extends StatelessWidget {
   Widget build(BuildContext context) {
     return Scaffold(
         body: Container(
+            constraints:
+                BoxConstraints(minHeight: MediaQuery.of(context).size.height),
             decoration: const BoxDecoration(
                 image: DecorationImage(
                     image: AssetImage('images/memegorithm_base.png'),
                     fit: BoxFit.cover)),
-            child: Container(
+            child: SingleChildScrollView(
+                child: Container(
               padding: const EdgeInsets.all(40),
               child: Column(
                 children: [
@@ -36,8 +39,10 @@ class PostDetailScreen extends StatelessWidget {
                   ),
                   const SizedBox(height: 30),
                   Container(
+                      width: 800,
                       decoration: const BoxDecoration(color: Colors.white),
                       child: Column(
+                        verticalDirection: VerticalDirection.down,
                         children: [
                           Text(post.title),
                           Text(post.user),
@@ -54,7 +59,7 @@ class PostDetailScreen extends StatelessWidget {
                   const SizedBox(height: 30),
                 ],
               ),
-            )));
+            ))));
   }
 
   Future<Widget> getImage(String imageName) async {
