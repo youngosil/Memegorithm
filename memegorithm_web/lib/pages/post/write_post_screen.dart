@@ -3,7 +3,10 @@ import 'dart:js_util';
 import 'dart:typed_data';
 import 'dart:async';
 import 'dart:convert';
+import 'dart:math';
+import 'dart:html' as html;
 
+import 'package:flutter/services.dart';
 import 'package:http/http.dart' as http;
 import 'package:cloud_firestore/cloud_firestore.dart';
 import 'package:firebase_auth/firebase_auth.dart';
@@ -15,6 +18,7 @@ import 'package:image_picker_web/image_picker_web.dart';
 import 'package:memegorithm_web/firebase_authentication.dart';
 import 'package:memegorithm_web/models/content.dart';
 import 'package:memegorithm_web/models/post.dart';
+import 'package:memegorithm_web/pages/home_screen.dart';
 
 class WritePostScreen extends StatefulWidget {
   static const routeName = '/home/write';
@@ -36,22 +40,11 @@ class _WritePostState extends State<WritePostScreen> {
   List<Widget> widgetList = [];
   List<String> contentList = [];
   List<TextEditingController> textControllers = [];
-  List<File> imgList = [];
 
   final TextEditingController titleController = TextEditingController();
-  String selectedValue = '';
-
-  final TextEditingController _textEditingController = TextEditingController();
   String selectedText = '';
+  String textContent = '';
   Timer? _debounceTimer;
-
-  @override
-  void initState() {
-    super.initState();
-
-    // Add a listener to the TextEditingController
-    _textEditingController.addListener(_updateSelectedText);
-  }
 
   @override
   void dispose() {
@@ -59,7 +52,6 @@ class _WritePostState extends State<WritePostScreen> {
     for (var controller in textControllers) {
       controller.dispose();
     }
-    _textEditingController.dispose();
     super.dispose();
   }
 
@@ -110,46 +102,119 @@ class _WritePostState extends State<WritePostScreen> {
                                   ),
                                   style: const TextStyle(
                                       fontFamily: 'Gulim',
-                                      color: Colors.black))),
+                                      color: Colors.black,
+                                      fontSize: 30))),
                           const SizedBox(height: 30),
-                          Padding(
-                            padding: const EdgeInsets.all(16.0),
-                            child: TextField(
-                              controller: _textEditingController,
-                              decoration: const InputDecoration(
-                                hintText: 'Type something...',
-                              ),
-                              maxLines: 10,
-                            ),
-                          ),
                           Column(children: widgetList),
+                          const SizedBox(
+                            height: 30,
+                          ),
                           Row(
+                            mainAxisAlignment: MainAxisAlignment.center,
                             children: [
                               ElevatedButton(
                                 onPressed: () {
                                   _addTextField();
                                 },
+                                style: ButtonStyle(
+                                  fixedSize: MaterialStateProperty.all<Size>(
+                                      const Size(110, 30)),
+                                  backgroundColor:
+                                      MaterialStateProperty.all<Color>(
+                                          Colors.grey), // 배경색
+                                  elevation: MaterialStateProperty.all<double>(
+                                      1), // 그림자
+                                  padding: MaterialStateProperty.all<
+                                      EdgeInsetsGeometry>(
+                                    const EdgeInsets.symmetric(vertical: 10),
+                                  ), // 내부 여백
+                                  shape:
+                                      MaterialStateProperty.all<OutlinedBorder>(
+                                    const RoundedRectangleBorder(
+                                      side: BorderSide(
+                                          color: Colors.black), // 테두리 색
+                                    ),
+                                  ),
+                                ),
                                 child: const Text('글 추가',
                                     style: TextStyle(
                                         fontFamily: 'Gulim',
-                                        color: Colors.black)),
+                                        color: Colors.black,
+                                        fontSize: 15,
+                                        fontWeight: FontWeight.bold)),
+                              ),
+                              const SizedBox(
+                                width: 20,
                               ),
                               ElevatedButton(
                                 onPressed: () {
                                   _pickImage();
                                 },
-                                child: const Text('이미지추가',
+                                style: ButtonStyle(
+                                  fixedSize: MaterialStateProperty.all<Size>(
+                                      const Size(110, 30)),
+                                  backgroundColor:
+                                      MaterialStateProperty.all<Color>(
+                                          Colors.grey), // 배경색
+                                  elevation: MaterialStateProperty.all<double>(
+                                      1), // 그림자
+                                  padding: MaterialStateProperty.all<
+                                      EdgeInsetsGeometry>(
+                                    const EdgeInsets.symmetric(vertical: 10),
+                                  ), // 내부 여백
+                                  shape:
+                                      MaterialStateProperty.all<OutlinedBorder>(
+                                    const RoundedRectangleBorder(
+                                      side: BorderSide(
+                                          color: Colors.black), // 테두리 색
+                                    ),
+                                  ),
+                                ),
+                                child: const Text('이미지 추가',
                                     style: TextStyle(
                                         fontFamily: 'Gulim',
-                                        color: Colors.black)),
+                                        color: Colors.black,
+                                        fontSize: 15,
+                                        fontWeight: FontWeight.bold)),
                               ),
                             ],
                           ),
+                          const SizedBox(height: 50),
                           ElevatedButton(
-                            onPressed: _submitPost,
+                            onPressed: () {
+                              _submitPost();
+                              Navigator.push(
+                                  context,
+                                  MaterialPageRoute(
+                                      builder: (context) => HomeScreen(
+                                          user: widget.user,
+                                          authService: widget._authService)));
+                            },
+                            style: ButtonStyle(
+                              fixedSize: MaterialStateProperty.all<Size>(
+                                  const Size(110, 30)),
+                              backgroundColor: MaterialStateProperty.all<Color>(
+                                  Colors.grey), // 배경색
+                              elevation:
+                                  MaterialStateProperty.all<double>(1), // 그림자
+                              padding:
+                                  MaterialStateProperty.all<EdgeInsetsGeometry>(
+                                const EdgeInsets.symmetric(
+                                    vertical: 10, horizontal: 16),
+                              ), // 내부 여백
+                              shape: MaterialStateProperty.all<OutlinedBorder>(
+                                const RoundedRectangleBorder(
+                                  side:
+                                      BorderSide(color: Colors.black), // 테두리 색
+                                ),
+                              ),
+                            ),
                             child: const Text('저장하기',
                                 style: TextStyle(
-                                    fontFamily: 'Gulim', color: Colors.black)),
+                                    fontFamily: 'Gulim',
+                                    color: Colors.black,
+                                    fontSize: 15,
+                                    fontWeight: FontWeight.bold)),
                           ),
                         ],
                       )),
@@ -160,36 +225,60 @@ class _WritePostState extends State<WritePostScreen> {
   }
 
   void _addTextField() {
-    //File file = newObject();
-    /*setState(() {
-      widgetList.add(
-        const TextField(
-          decoration: InputDecoration(
-            hintText: 'Enter text...',
-          ),
-        ),
-      );
-      contentList.add('');
-      //imgList.add(file);*/
-
     TextEditingController controller = TextEditingController();
     textControllers.add(controller);
 
+    controller.addListener(() {
+      _updateSelectedText(controller);
+    });
+
+    /*setState(() {
+      widgetList.add(
+        Theme(
+            data: Theme.of(context).copyWith(
+                textSelectionTheme: const TextSelectionThemeData(
+                    selectionColor: Color(0xffFFFF00))),
+            child: TextField(
+                controller: controller,
+                onChanged: (text) {
+                  // Update the contentList when the text changes
+                  int index = textControllers.indexOf(controller);
+                  if (index >= 0 && index < contentList.length) {
+                    contentList[index] = text;
+                  }
+                },
+                decoration: const InputDecoration(
+                  border: InputBorder.none,
+                  hintText: '내용을 입력하세요...',
+                  hintStyle: TextStyle(fontFamily: 'Gulim', color: Colors.grey),
+                ),
+                style: const TextStyle(
+                    fontFamily: 'Gulim', color: Colors.black, fontSize: 18),
+                cursorColor: Colors.black,
+                maxLines: 5)),
+      );
+      contentList.add('');
+    });*/
     setState(() {
       widgetList.add(
         TextField(
-          controller: controller,
-          decoration: const InputDecoration(
-            hintText: 'Enter text...',
-          ),
-          onChanged: (text) {
-            // Update the contentList when the text changes
-            int index = textControllers.indexOf(controller);
-            if (index >= 0 && index < contentList.length) {
-              contentList[index] = text;
-            }
-          },
-        ),
+            controller: controller,
+            decoration: const InputDecoration(
+              border: InputBorder.none,
+              hintText: '내용을 입력하세요...',
+              hintStyle: TextStyle(fontFamily: 'Gulim', color: Colors.grey),
+            ),
+            style: const TextStyle(
+                fontFamily: 'Gulim', color: Colors.black, fontSize: 18),
+            cursorColor: Colors.black,
+            maxLines: 5,
+            onChanged: (text) {
+              // Update the contentList when the text changes
+              int index = textControllers.indexOf(controller);
+              if (index >= 0 && index < contentList.length) {
+                contentList[index] = text;
+              }
+            }),
       );
       contentList.add('');
     });
@@ -221,14 +310,18 @@ class _WritePostState extends State<WritePostScreen> {
   }*/
 
   Future<void> _pickImage() async {
-    /*File imgFile = ImagePickerWeb.getImageAsFile() as File;
-    String name = 'test1';
+    // Use File? instead of File
+    html.File? imgFile = (await ImagePickerWeb.getImageAsFile());
 
-    setState(() {
-      widgetList.add(image!);
-      contentList.add(image.toString());
-      //imgList.add(imageFile);
-    });*/
+    if (imgFile != null) {
+      String name = await _uploadImage(imgFile);
+      Widget image = await getImage(name);
+
+      setState(() {
+        widgetList.add(image);
+        contentList.add(name);
+      });
+    }
   }
 
   /*Future<void> _pickImage() async {
@@ -243,19 +336,37 @@ class _WritePostState extends State<WritePostScreen> {
     });
   }*/
 
+  Future<Widget> getImage(String imageName) async {
+    final ref = FirebaseStorage.instance.ref().child('$imageName.jpg');
+
+    try {
+      var url = await ref.getDownloadURL();
+      print(url);
+      return Image.network(url, width: 300);
+    } catch (e) {
+      print('Error loading image: $e');
+      return const Text(
+          'Error loading image'); // Return a placeholder or handle the error accordingly
+    }
+  }
+
   void _submitPost() async {
     List<Content> contents = [];
 
+    print(widgetList.length);
+    print(contentList.length);
+
+    int j = 0;
     for (int i = 0; i < widgetList.length; i++) {
       var content = widgetList[i];
       if (content is TextField) {
         // Text content
-        contents.add(Content(type: 'text', content: textControllers[i].text));
+        contents.add(Content(type: 'text', content: textControllers[j].text));
+        j++;
       } else if (content is Image) {
         // Image content
         // Upload image to Firebase Storage and get the download URL
         contents.add(Content(type: 'image', content: contentList[i]));
-        _uploadImage(contentList[i], imgList[i]);
       }
     }
 
@@ -267,6 +378,7 @@ class _WritePostState extends State<WritePostScreen> {
     // Now, you have title and contents
     // Call your FirebaseService to upload the post
     try {
+      print('check');
       await FirebaseFirestore.instance.collection('posts').add(post.toMap());
       // Successfully added post to Firestore
     } catch (error) {
@@ -274,45 +386,51 @@ class _WritePostState extends State<WritePostScreen> {
     }
   }
 
-  void _uploadImage(String name, File data) async {
+  Future<String> _uploadImage(html.File data) async {
     // Create a storage reference from our app
     final storageRef = FirebaseStorage.instance.ref();
 
+    String name = '${Random().nextInt(10000) + 1336}';
+    print(name);
+
     // Create a reference to "mountains.jpg"
-    final mountainsRef = storageRef.child(name);
+    final mountainsRef = storageRef.child('$name.jpg');
+    print(mountainsRef);
 
     // Create a reference to 'images/mountains.jpg'
-    final mountainImagesRef = storageRef.child(data.toString());
+    final mountainImagesRef = storageRef.child(name);
 
     // While the file names are the same, the references point to different files
-    assert(mountainsRef.name == mountainImagesRef.name);
-    assert(mountainsRef.fullPath != mountainImagesRef.fullPath);
+    //assert(mountainsRef.name == mountainImagesRef.name);
+    //assert(mountainsRef.fullPath != mountainImagesRef.fullPath);
 
     try {
       // Upload raw data.
-      await mountainsRef.putFile(data);
+      await mountainsRef.putBlob(data);
+      return name;
     } catch (e) {
       print("Error: uploading image to Firestore");
+      return "";
     }
   }
 
-  void _updateSelectedText() {
+  void _updateSelectedText(TextEditingController controller) {
     // Cancel the previous debounce timer
     _debounceTimer?.cancel();
 
     // Create a new debounce timer
     _debounceTimer = Timer(const Duration(milliseconds: 700), () {
       // Get the selection
-      TextSelection selection = _textEditingController.selection;
+      TextSelection selection = controller.selection;
 
       // Check if there is any selection
       if (selection.end != null) {
         // Extract the selected text
-        String newText = _textEditingController.text
-            .substring(selection.start, selection.end);
+        String newText =
+            controller.text.substring(selection.start, selection.end);
 
         // Check if the text has changed
-        if (newText != selectedText) {
+        if (newText != selectedText && newText != "") {
           selectedText = newText;
           Future<String> res = sendPostRequest(selectedText);
           setState(() {
@@ -335,7 +453,6 @@ class _WritePostState extends State<WritePostScreen> {
   Future<String> sendPostRequest(String message) async {
     String url = 'http://165.132.46.82:30527/';
     Map<String, String> headers = {"Content-Type": "application/json"};
-    //Map<String, dynamic> data = {'text': message};
     String jsonBody = json.encode({'text': message});
 
     // POST 요청을 보내고 응답을 받음
@@ -345,7 +462,16 @@ class _WritePostState extends State<WritePostScreen> {
       body: jsonBody,
     );
 
-    print(utf8.decode(response.bodyBytes));
+    var data = json.decode(utf8.decode(response.bodyBytes));
+
+    String id = data['image_id'];
+    print(id);
+    Widget imageWidget = await getImage(id);
+
+    setState(() {
+      widgetList.add(imageWidget);
+      contentList.add(id);
+    });
     return utf8.decode(response.bodyBytes);
   }
 }

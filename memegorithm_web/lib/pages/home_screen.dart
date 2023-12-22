@@ -73,9 +73,28 @@ class _HomeScreenState extends State<HomeScreen> {
                         onPressed: () async {
                           widget._authService.signOut();
                         },
+                        style: ButtonStyle(
+                          backgroundColor: MaterialStateProperty.all<Color>(
+                              Colors.grey), // 배경색
+                          elevation:
+                              MaterialStateProperty.all<double>(1), // 그림자
+                          padding:
+                              MaterialStateProperty.all<EdgeInsetsGeometry>(
+                            const EdgeInsets.symmetric(
+                                vertical: 10, horizontal: 16),
+                          ), // 내부 여백
+                          shape: MaterialStateProperty.all<OutlinedBorder>(
+                            const RoundedRectangleBorder(
+                              side: BorderSide(color: Colors.black), // 테두리 색
+                            ),
+                          ),
+                        ),
                         child: const Text('로그아웃',
                             style: TextStyle(
-                                fontFamily: 'Gulim', color: Colors.black)),
+                                fontFamily: 'Gulim',
+                                color: Colors.black,
+                                fontSize: 15,
+                                fontWeight: FontWeight.bold)),
                       ),
                     ],
                   ),
@@ -96,14 +115,20 @@ class _HomeScreenState extends State<HomeScreen> {
                                 itemCount: posts.length,
                                 itemBuilder: (context, index) {
                                   return ListTile(
+                                    minVerticalPadding: 20,
                                     leading: const SizedBox(
-                                        width: 50,
-                                        height: 50,
+                                        height: 200,
                                         child: Image(
                                             image: AssetImage(
                                                 'images/file_icon.png'),
-                                            fit: BoxFit.fill)),
-                                    title: Text(posts[index].title),
+                                            fit: BoxFit.fitHeight)),
+                                    title: Text(
+                                      posts[index].title,
+                                      style: const TextStyle(
+                                          fontSize: 22,
+                                          fontFamily: 'Gulim',
+                                          fontWeight: FontWeight.bold),
+                                    ),
                                     // 글을 눌렀을 때 글 상세 페이지로 이동하는 로직 추가
                                     onTap: () {
                                       Navigator.push(
@@ -128,9 +153,26 @@ class _HomeScreenState extends State<HomeScreen> {
                                 authService: widget._authService)),
                       );
                     },
+                    style: ButtonStyle(
+                      backgroundColor:
+                          MaterialStateProperty.all<Color>(Colors.grey), // 배경색
+                      elevation: MaterialStateProperty.all<double>(1), // 그림자
+                      padding: MaterialStateProperty.all<EdgeInsetsGeometry>(
+                        const EdgeInsets.symmetric(
+                            vertical: 10, horizontal: 16),
+                      ), // 내부 여백
+                      shape: MaterialStateProperty.all<OutlinedBorder>(
+                        const RoundedRectangleBorder(
+                          side: BorderSide(color: Colors.black), // 테두리 색
+                        ),
+                      ),
+                    ),
                     child: const Text('글쓰기',
                         style: TextStyle(
-                            fontFamily: 'Gulim', color: Colors.black)),
+                            fontFamily: 'Gulim',
+                            color: Colors.black,
+                            fontSize: 15,
+                            fontWeight: FontWeight.bold)),
                   ),
                 ],
               ),
@@ -154,9 +196,10 @@ class _HomeScreenState extends State<HomeScreen> {
 
         // Create a Post instance
         Post post = Post.fromMap(data);
+        print(post);
         posts.add(post);
+        print(posts);
       }
-
       // TODO: Use the 'posts' list in your application logic
     } catch (error) {
       print('Error fetching posts: $error');

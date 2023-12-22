@@ -47,8 +47,10 @@ class SignInScreen extends StatelessWidget {
                               filled: true,
                               fillColor: Colors.white,
                               border: OutlineInputBorder(
-                                  borderSide: BorderSide(
-                                      color: Colors.black, width: 1))),
+                                borderSide:
+                                    BorderSide(color: Colors.black, width: 1),
+                                borderRadius: BorderRadius.zero,
+                              )),
                           style: const TextStyle(
                               fontFamily: 'Gulim', color: Colors.black))),
                   const SizedBox(height: 7),
@@ -63,8 +65,10 @@ class SignInScreen extends StatelessWidget {
                               filled: true,
                               fillColor: Colors.white,
                               border: OutlineInputBorder(
-                                  borderSide: BorderSide(
-                                      color: Colors.black, width: 1))),
+                                borderSide:
+                                    BorderSide(color: Colors.black, width: 1),
+                                borderRadius: BorderRadius.zero,
+                              )),
                           obscureText: true,
                           style: const TextStyle(
                               fontFamily: 'Gulim', color: Colors.black))),
@@ -84,9 +88,28 @@ class SignInScreen extends StatelessWidget {
                             print('Error during user registration: $e');
                           }
                         },
+                        style: ButtonStyle(
+                          backgroundColor: MaterialStateProperty.all<Color>(
+                              Colors.grey), // 배경색
+                          elevation:
+                              MaterialStateProperty.all<double>(1), // 그림자
+                          padding:
+                              MaterialStateProperty.all<EdgeInsetsGeometry>(
+                            const EdgeInsets.symmetric(
+                                vertical: 10, horizontal: 16),
+                          ), // 내부 여백
+                          shape: MaterialStateProperty.all<OutlinedBorder>(
+                            const RoundedRectangleBorder(
+                              side: BorderSide(color: Colors.black), // 테두리 색
+                            ),
+                          ),
+                        ),
                         child: const Text('회원가입',
                             style: TextStyle(
-                                fontFamily: 'Gulim', color: Colors.black)),
+                                fontFamily: 'Gulim',
+                                color: Colors.black,
+                                fontSize: 15,
+                                fontWeight: FontWeight.bold)),
                       ),
                       const SizedBox(width: 16),
                       ElevatedButton(
@@ -101,9 +124,28 @@ class SignInScreen extends StatelessWidget {
                             print('Error during user login: $e');
                           }
                         },
+                        style: ButtonStyle(
+                          backgroundColor: MaterialStateProperty.all<Color>(
+                              Colors.grey), // 배경색
+                          elevation:
+                              MaterialStateProperty.all<double>(1), // 그림자
+                          padding:
+                              MaterialStateProperty.all<EdgeInsetsGeometry>(
+                            const EdgeInsets.symmetric(
+                                vertical: 10, horizontal: 16),
+                          ), // 내부 여백
+                          shape: MaterialStateProperty.all<OutlinedBorder>(
+                            const RoundedRectangleBorder(
+                              side: BorderSide(color: Colors.black), // 테두리 색
+                            ),
+                          ),
+                        ),
                         child: const Text('로그인',
                             style: TextStyle(
-                                fontFamily: 'Gulim', color: Colors.black)),
+                                fontFamily: 'Gulim',
+                                color: Colors.black,
+                                fontSize: 15,
+                                fontWeight: FontWeight.bold)),
                       ),
                     ],
                   )
