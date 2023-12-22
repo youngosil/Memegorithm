@@ -1,3 +1,4 @@
+import 'dart:convert';
 import 'dart:js_interop';
 
 import 'package:firebase_storage/firebase_storage.dart';
@@ -40,20 +41,43 @@ class PostDetailScreen extends StatelessWidget {
                   const SizedBox(height: 30),
                   Container(
                       width: 800,
+                      padding: const EdgeInsets.symmetric(horizontal: 40),
                       decoration: const BoxDecoration(color: Colors.white),
                       child: Column(
                         verticalDirection: VerticalDirection.down,
                         children: [
-                          Text(post.title),
-                          Text(post.user),
+                          const SizedBox(height: 30),
+                          Text(post.title,
+                              style: const TextStyle(
+                                  fontFamily: 'Gulim',
+                                  fontSize: 30,
+                                  fontWeight: FontWeight.bold)),
+                          const SizedBox(height: 10),
                           SizedBox(
-                              height: 500,
+                            width: 700, // SizedBox의 width를 800으로 제한
+                            child: Text(
+                              post.user,
+                              textAlign: TextAlign.right,
+                              style: const TextStyle(
+                                  fontFamily: 'Gulim', fontSize: 15),
+                            ),
+                          ),
+                          const SizedBox(height: 50),
+                          SizedBox(
                               child: ListView.builder(
-                                itemCount: post.contents.length,
-                                itemBuilder: (context, index) {
-                                  return getContentWidget(post.contents[index]);
-                                },
-                              ))
+                            shrinkWrap: true,
+                            itemCount: post.contents.length,
+                            itemBuilder: (context, index) {
+                              return Column(
+                                children: [
+                                  getContentWidget(post.contents[index]),
+                                  const SizedBox(
+                                      height:
+                                          5), // 각 아이템 사이에 간격을 주기 위한 SizedBox
+                                ],
+                              );
+                            },
+                          ))
                         ],
                       )),
                   const SizedBox(height: 30),
@@ -63,12 +87,12 @@ class PostDetailScreen extends StatelessWidget {
   }
 
   Future<Widget> getImage(String imageName) async {
-    final ref = FirebaseStorage.instance.ref().child(imageName);
+    final ref = FirebaseStorage.instance.ref().child('$imageName.jpg');
 
     try {
       var url = await ref.getDownloadURL();
       print(url);
-      return Image.network(url, width: 100, height: 100);
+      return Image.network(url, width: 250, height: 250);
     } catch (e) {
       print('Error loading image: $e');
       return const Text(
@@ -78,7 +102,9 @@ class PostDetailScreen extends StatelessWidget {
 
   Widget getContentWidget(Content content) {
     if (content.type == 'text') {
-      return Text(content.content);
+      return Text(content.content,
+          textAlign: TextAlign.center,
+          style: const TextStyle(fontFamily: 'Gulim', fontSize: 18));
     } else {
       return FutureBuilder<Widget>(
         future: getImage(content.content),
