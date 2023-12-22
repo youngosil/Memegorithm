@@ -4,7 +4,7 @@ from utils.generate import generate_summarization, generate_sentiment
 from models.similarity import calculatesim
 from configs.sentiments import emotion_relations, label_to_class, class_to_label
 
-import firebase_admin
+import firebase_admin, argparse
 from firebase_admin import credentials
 from firebase_admin import firestore
 from google.cloud.firestore_v1.base_query import FieldFilter
@@ -126,4 +126,7 @@ def post():
 
 # Run server
 if __name__ == '__main__':
-    app.run(host='0.0.0.0', port=7070)
+    argparser = argparse.ArgumentParser()
+    argparser.add_argument('--port', type=int, default=7070)
+    args = argparser.parse_args()
+    app.run(host='0.0.0.0', port=args.port)
