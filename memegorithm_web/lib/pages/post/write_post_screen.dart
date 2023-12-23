@@ -451,7 +451,8 @@ class _WritePostState extends State<WritePostScreen> {
   }
 
   Future<String> sendPostRequest(String message) async {
-    String url = 'http://165.132.46.82:30527/';
+    // String url = 'http://165.132.46.82:30527/'; // When using vessl
+    String url = 'https://b4ea8a541a39.ngrok.app/'; // When using ngrok
     Map<String, String> headers = {"Content-Type": "application/json"};
     String jsonBody = json.encode({'text': message});
 
