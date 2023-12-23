@@ -1,4 +1,5 @@
 from flask import Flask, request
+from flask_cors import CORS
 from flask import jsonify
 from utils.generate import generate_summarization, generate_sentiment
 from models.similarity import calculatesim
@@ -12,6 +13,7 @@ from vllm import LLM, SamplingParams
 
 # Initialize Flask app
 app = Flask(__name__)
+CORS(app)
 
 # Initialize Firestore DB
 cred = credentials.Certificate('ybigta-memegorithm-firebase-adminsdk-8f0wp-b6ed71bf6b.json')

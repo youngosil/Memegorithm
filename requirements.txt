@@ -21,5 +21,6 @@ ray
 pyarrow
 pandas
 flask
+flask-cors
 sentence-transformers
 firebase-admin
