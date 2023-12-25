@@ -1,14 +1,19 @@
-# Memegorithm
+# Memegorithm (YBIGTA 2023-2 Conference)
+A multimodal meme retrieval system that utilizes a Llama-based Language Model (LLM) and Visual Sentiment Prediction (VSP)
+
+## Last Update (December 25, 2023)
+> Fixed the model server URL for consistent access
+
+> Included example images
+
+> Included [README.md](./visual_sentiment_prediction/README.md) for running visual sentiment prediction (VSP)
 
 <p align="center">
   <img src="./assets/example.png" width="600" />
 </p>
 
 <!-- ![Example image](./assets/example.png) -->
-## Last Update (December 25, 2023)
-> Included example images
 
-> Included [README.md](./visual_sentiment_prediction/README.md) for running visual sentiment prediction (VSP)
 
 ## Getting Started
 ### Prerequisites
